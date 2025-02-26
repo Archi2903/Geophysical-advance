@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 # Ввод размера матрицы
 size = eval(input("matrix size: "))
 
-# Инициализация матрицы
+# Инициализация матрицы нулями размером size         
 O = np.zeros((size[0], size[1]))
 
 # Заполнение матрицы значениями
