@@ -1,26 +1,51 @@
 import numpy as np
 
-# Определяем матрицу
-A = np.array([[3, 2, 5], [1, 4, 7], [2, 6, 8]])
+# Определение A: квадратная матрица размерности n x n
+A = np.array([[3, 0, 0], 
+              [0, 3, 0], 
+              [0, 0, 3]])
 
-# 1. Через формулу для 3x3 (через определитель и алгебраические дополнения)
-DetA = np.linalg.det(A) # Определитель матрицы
-A_inv_formula = np.linalg.inv(A) if DetA != 0 else "Matrix is singular" # Если определитель не равен 0, то находим обратную матрицу
-print("Inverse using formula:")
-print(A_inv_formula)
+# Определение A.4: если существует такая матрица B, что AB = BA = I, то B является обратной матрицей A.
+# 1. Проверяем, существует ли обратная матрица, вычисляя определитель
+# Через формулу для 3x3 (определитель и обратная матрица)
+# Определитель матрицы:
+# det(A) = a11(a22 * a33 - a23 * a32) - a12(a21 * a33 - a23 * a31) + a13(a21 * a32 - a22 * a31)
 
-# 2. Метод Гаусса-Жордана (приведение к единичной матрице)
-A_ext = np.hstack((A, np.eye(3)))  # Расширенная матрица
-for i in range(3):
-    A_ext[i] = A_ext[i] / A_ext[i, i]  # Делаем ведущий элемент 1
-    for j in range(3):
-        if i != j:
-            A_ext[j] -= A_ext[i] * A_ext[j, i]  # Обнуляем остальные элементы столбца
-A_inv_gauss = A_ext[:, 3:]
-print("Inverse using Gauss-Jordan:")
-print(A_inv_gauss)
+DetA = np.linalg.det(A)
+# Если det(A) ≠ 0, обратная матрица вычисляется как A^(-1) = (1/det(A)) * adj(A)
+# adj(A) — это матрица алгебраических дополнений
+"""   adj_A = np.array([[A[1, 2] * A[2, 2] - A[1, 2] * A[2, 1], A[0, 2] * A[2, 1] - A[0, 1] * A[2, 2], A[0, 1] * A[1, 2] - A[0, 2] * A[1, 1]],
+                     [A[1, 0] * A[2, 2] - A[1, 2] * A[2, 0], A[0, 2] * A[2, 0] - A[0, 0] * A[2, 2], A[0, 0] * A[1, 2] - A[0, 2] * A[1, 0]],
+                     [A"""
+# Если det(A) ≠ 0, то обратная матрица существует и может быть найдена
+if DetA != 0:
+    # Определение A.3: единичная матрица размерности 3x3
+    I3 = np.eye(3)
 
-# 3. С использованием numpy
-A_inv_numpy = np.linalg.inv(A) if DetA != 0 else "Matrix is singular"
-print("Inverse using numpy:")
-print(A_inv_numpy)
+    # Метод 1: Используем формулу A⁻¹ = adj(A) / det(A)
+    A_inv_formula = np.linalg.inv(A)
+    print("Inverse using formula:")
+    print(A_inv_formula)
+
+    # Метод 2: Применение метода Гаусса-Жордана для нахождения A⁻¹
+    # Для нахождения обратной матрицы методом Гаусса-Жордана составляем расширенную матрицу [A | I]
+    # A_ext = [ 3  2  5 | 1  0  0 ]
+    #         [ 1  4  7 | 0  1  0 ]
+    #         [ 2  6  8 | 0  0  1 ]
+    A_ext = np.hstack((A, I3))  # Формируем расширенную матрицу [A | I]
+    for i in range(3):
+        A_ext[i] = A_ext[i] / A_ext[i, i]  # Делаем диагональный элемент равным 1
+        for j in range(3):
+            if i != j:
+                A_ext[j] -= A_ext[i] * A_ext[j, i]  # Обнуляем элементы вне диагонали
+    A_inv_gauss = A_ext[:, 3:]
+    print("Inverse using Gauss-Jordan:")
+    print(A_inv_gauss)
+
+    # Метод 3: Используем встроенный метод NumPy
+    A_inv_numpy = np.linalg.inv(A)
+    print("Inverse using numpy:")
+    print(A_inv_numpy)
+
+else:
+    print("Matrix A is singular and does not have an inverse.")
