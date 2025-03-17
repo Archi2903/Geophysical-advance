@@ -3,7 +3,7 @@
 "A2 Reducing a matrix to row-echelon form RREF"
 import sympy as sp # SymPy is a Python library for symbolic mathematics
 import numpy as np 
-
+#weeee
 A = np.array([
     [1, 2, 3],
     [4, 5, 6],
