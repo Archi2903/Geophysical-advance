@@ -86,7 +86,7 @@ for i, (pair, ax) in enumerate(zip([(0,1), (0,2), (1,2)], axs)):
     ax.scatter(mL2[idx1], mL2[idx2], color='red', s=50)
     
     # LAbes
-    labels = ['m1 (м)', 'm2 (м/с)', 'm3 (м/с²)']
+    labels = ['m1 (m)', 'm2 (m/s)', 'm3 (m/s²)']
     ax.set_xlabel(labels[idx1])
     ax.set_ylabel(labels[idx2])
     
@@ -170,8 +170,8 @@ ax.text(bbox_center[0], bbox_center[1], bbox_center[2], annotation_text,
 
 # label and titels
 ax.set_xlabel('m1 (м)', fontsize=12)
-ax.set_ylabel('m2 (м/с)', fontsize=12)
-ax.set_zlabel('m3 (м/с²)', fontsize=12)
+ax.set_ylabel('m2 (м/s)', fontsize=12)
+ax.set_zlabel('m3 (м/s²)', fontsize=12)
 ax.set_title('3D Confidence Ellipsoid with Bounding Box', fontsize=14)
 
 ax.view_init(elev=25, azim=45)
