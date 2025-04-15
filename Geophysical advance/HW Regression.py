@@ -124,7 +124,8 @@ z = np.outer(np.ones_like(u), np.cos(v))
 sphere_points = np.vstack([x.flatten(), y.flatten(), z.flatten()])
 
 # Transform sphere to ellipsoid
-scaled_points = sphere_points * semi_axes[:, np.newaxis]
+scaled_points = sphere_points * semi_axes[:, np.newaxis] # scale
+# Rotate points using eigenvectors
 rotated_points = eigenvecs @ scaled_points
 ellipsoid_points = rotated_points + mL2[:, np.newaxis]
 
