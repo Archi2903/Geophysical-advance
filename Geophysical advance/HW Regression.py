@@ -2,46 +2,33 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import chi2
 from mpl_toolkits.mplot3d import Axes3D
-# Задача: оценка параметров модели с помощью метода наименьших квадратов (МНК) и анализ неопределенности параметров модели.
-# этапы оценки параметров модели с помощью метода наименьших квадратов (МНК) и анализ неопределенности параметров модели.
-# 1. Определение модели и параметров
-# 2. Сбор данных и определение матрицы наблюдений                                                   
+
 "Стандартные ошибки параметров"
-# Covariace matrix Cov(θ) = σ^2 * ((G^T)*G)^-1
-# нужна для оценки неопределённости параметров модели
+# Covariace matrix
+#Cov(θ) = σ^2 * ((G^T)*G)^-1 evequation
 Cov = np.array([
     [88.53, -33.60, -5.33],
     [-33.60, 15.44, 2.67],
     [-5.33, 2.67, 0.48]
 ])
 
-# mtrue = [10m, 100m/s, 9.8m/s^2] # истинные значения параметров модели
-# mL2 = [16.4m, 97.0m/s, 9.4m/s^2] # оценённые параметры модели с учетом шума σ=8м
+# mtrue = [10m, 100m/s, 9.8m/s^2]
 # σ=8м - noise
-
+# mL2 = (((G^T)*G)^-1)(G^T)*d
 # Оценённые параметры
 
-#95% доверительные интервалы это интервалы, в которых истинные значения параметров модели с вероятностью 95% находятся в пределах этих интервалов.
-# Для 3 параметров модели (m1, m2, m3) и 10 наблюдений (n=10) степень свободы = n - k = 10 - 3 = 7
-# m+-1.968*σ*sqrt(Cov(θ)) оценка параметров модели с учетом шума σ=8м
-# mL2 = (((G^T)*G)^-1)(G^T)*d # mL2 = np.linalg.inv(G.T @ G) @ (G.T @ d) np.linalg.inv(G.T @ G) - обратная матрица
-mL2 = np.array([16.42, 96.97, 9.41]) # оценённые параметры модели с учетом шума σ=8м
+#95% ловерительные интервалы
+# m+-1.96*
+mL2 = np.array([16.42, 96.97, 9.41])
 # m1=16.4m-+ 18.4m ->[-2.0, 34.8]
 # m2=97.0m/s-+ 7.7m/s ->[89.3, 104.7]
 # m3=9.4m/s^2-+ 1.4m/s^2 ->[8.0, 10.8]
-# ml2 ист знач попадают в интервалы, а занчит оценка согласуется несмотря на шум
 
-# наблюдается смещение 
-# Ковариационная матрица отражает неопределённость оценок из-за шума в данных.
-# Результат близок к истинным значениям, но с отклонениями из-за ошибок измерений.
+"Interpretation:mtrue values fall within the Confidence Intervals, Estimate is consistent despite the noise!"
 # Result mtrue and mL2 estimate a little bit diffrent because σ=8м - noise
 
-# Критическое значение χ² для 3 степеней свободы и 95% доверия 
-# χ² это распределение, которое используется для проверки гипотезы о соответствии модели данным. v=7
-chi2_crit = chi2.ppf(0.95, 3)  # ≈7.815 v=7
-# chi2_crit равно 7.815, что соответствует 95% доверительному интервалу для 3 степеней свободы.
-# при значениях не превышающих 7.815, модель считается адекватной данным.
-# Если χ² больше 7.815, то модель не соответствует данным.
+# Критическое значение χ² для 3 степеней свободы и 95% доверия
+chi2_crit = chi2.ppf(0.95, 3)  # ≈7.815
 """
 Проверка Критическое значение χ²
 # Исходные данные
@@ -76,63 +63,132 @@ plt.show()
 """
 
 
-# Вычисление обратной матрицы ковариации это важный шаг в анализе неопределённости параметров модели.
-# Она позволяет оценить, насколько сильно изменяются параметры модели при изменении входных данных.
-Cinv = np.linalg.inv(Cov) # np.linalg.inv(Cov) - обратная матрица ковариации
+# Вычисление обратной матрицы ковариации
+Cinv = np.linalg.inv(Cov)
 
-# Собственные значения и векторы Cinv это важные характеристики матрицы, которые позволяют понять, как параметры модели связаны друг с другом.
-# Собственные значения показывают, насколько сильно изменяются параметры модели при изменении входных данных.
-eigenvals, eigenvecs = np.linalg.eigh(Cinv) # np.linalg.eigh(Cinv) - собственные значения и векторы матрицы Cinv
-# Собственные значения и векторы это важные характеристики матрицы, которые позволяют понять, как параметры модели связаны друг с другом.
+# Собственные значения и векторы Cinv
+eigenvals, eigenvecs = np.linalg.eigh(Cinv)
 # Сортировка в порядке убывания собственных значений
-eigenvals = eigenvals[::-1] # Сортировка в порядке убывания собственных значений
-eigenvecs = eigenvecs[:, ::-1] # Сортировка в порядке убывания собственных векторов
+eigenvals = eigenvals[::-1]
+eigenvecs = eigenvecs[:, ::-1]
 
-# Длины полуосей эллипсоида доверия
-# Собственные значения показывают, насколько сильно изменяются параметры модели при изменении входных данных.
-semi_axes = np.sqrt(chi2_crit / eigenvals) # np.sqrt(chi2_crit / eigenvals) - длины полуосей эллипсоида доверия
+# Длины полуосей эллипсоида
+semi_axes = np.sqrt(chi2_crit / eigenvals)
 
-# Параметризация единичной сферы для построения эллипсоида
-# Параметризация единичной сферы это важный шаг в построении эллипсоида доверия.
-theta = np.linspace(0, 2*np.pi, 100) # здесь мы создаем 100 точек от 0 до 2π, чтобы получить полный круг
-circle = np.array([np.cos(theta), np.sin(theta)]) # np.array([np.cos(theta), np.sin(theta)]) - единичная окружность в 2D
-# Здесь мы создаем 100 точек от 0 до 2π, чтобы получить полный круг
+# Параметризация единичной сферы
+theta = np.linspace(0, 2*np.pi, 100)
+circle = np.array([np.cos(theta), np.sin(theta)])
 
-# Создаем 3 отдельных графикa
+# Create 3 graphs
 fig, axs = plt.subplots(1, 3, figsize=(18, 5))
 
-# Для каждой проекции
+# For every projections
 for i, (pair, ax) in enumerate(zip([(0,1), (0,2), (1,2)], axs)):
-    # Выбираем индексы параметров для проекции
+    # Index parametrs for every projections
     idx1, idx2 = pair
     
-    # Выделяем подматрицу ковариации для выбранных параметров 
-    # это нужно для построения эллипсоида доверия
-    # получаем подматрицу ковариации для выбранных параметров
-    # Cov_sub = Cov[[idx1, idx1], [idx2, idx2]] - это не верно
-    
+    # Выделяем подматрицу ковариации для выбранных параметров
     Cov_sub = Cov[[[idx1, idx1], [idx2, idx2]], [[idx1, idx2], [idx1, idx2]]]
     
-    # Создаем эллипс для проекции
+    # Create ellips for projections
     L = np.linalg.cholesky(Cov_sub)  # Разложение Холецкого
     ellipse = (L @ (circle * np.sqrt(chi2_crit)) + mL2[[idx1, idx2]].reshape(2,1))
     
-    # Рисуем эллипс
+    # ellips
     ax.plot(ellipse[0], ellipse[1], color='blue', alpha=0.5)
     ax.scatter(mL2[idx1], mL2[idx2], color='red', s=50)
     
-    # Подписи осей
-    labels = ['m1 (м)', 'm2 (м/с)', 'm3 (м/с²)']
+    # LAbes
+    labels = ['m1 (m)', 'm2 (m/s)', 'm3 (m/s²)']
     ax.set_xlabel(labels[idx1])
     ax.set_ylabel(labels[idx2])
     
     # Названия графиков
-    titles = [' p(m1, m2) -0.91', ' (m1, m3) -0.81', ' (m2, m3) 0.97']
+    titles = [' (m1, m2)', ' (m1, m3)', ' (m2, m3)']
     ax.set_title(titles[i])
     
-    # Сетка и оформление
+    # Grid
     ax.grid(True, linestyle='--', alpha=0.7)
     ax.axhline(0, color='black', linewidth=0.5)
     ax.axvline(0, color='black', linewidth=0.5)
+    
+""" ------------------------- 3D vizual -------------------------"""
+from itertools import product
+
+# paramets for sphere
+u = np.linspace(0, 2*np.pi, 100)
+v = np.linspace(0, np.pi, 100)
+x = np.outer(np.cos(u), np.sin(v))
+y = np.outer(np.sin(u), np.sin(v))
+z = np.outer(np.ones_like(u), np.cos(v))
+sphere_points = np.vstack([x.flatten(), y.flatten(), z.flatten()])
+
+# Transform sphere to ellipsoid
+scaled_points = sphere_points * semi_axes[:, np.newaxis]
+rotated_points = eigenvecs @ scaled_points
+ellipsoid_points = rotated_points + mL2[:, np.newaxis]
+
+""" bounding box """
+deltas = np.ptp(ellipsoid_points, axis=1) / 2
+intervals = np.vstack([mL2 - deltas, mL2 + deltas]).T
+
+# Output of intervals for comparison with equation 2.50
+print("Compute mL2 (mL2 ± delta):")
+print("m1: {:.2f} ± {:.2f}  => [{:.2f}, {:.2f}]".format(mL2[0], deltas[0],
+      mL2[0]-deltas[0], mL2[0]+deltas[0]))
+print("m2: {:.2f} ± {:.2f}  => [{:.2f}, {:.2f}]".format(mL2[1], deltas[1],
+      mL2[1]-deltas[1], mL2[1]+deltas[1]))
+print("m3: {:.2f} ± {:.2f}  => [{:.2f}, {:.2f}]".format(mL2[2], deltas[2],
+      mL2[2]-deltas[2], mL2[2]+deltas[2]))
+
+# Plot 3d
+fig = plt.figure(figsize=(10, 8))
+ax = fig.add_subplot(111, projection='3d')
+
+# ellipsoid
+ax.scatter(ellipsoid_points[0], ellipsoid_points[1], ellipsoid_points[2], 
+           c='blue', alpha=0.1, s=1, label='Confidence Ellipsoid')
+
+# Углы bounding box
+corners = np.array(list(product(
+    [intervals[0, 0], intervals[0, 1]],
+    [intervals[1, 0], intervals[1, 1]],
+    [intervals[2, 0], intervals[2, 1]]
+)))
+
+# edge bounding box
+for i, edge in enumerate([
+    [0,1], [0,2], [0,4],
+    [1,3], [1,5],
+    [2,3], [2,6],
+    [3,7],
+    [4,5], [4,6],
+    [5,7],
+    [6,7]
+]):
+    if i == 0:
+        ax.plot(*zip(*corners[edge]), color='red', linestyle='--', linewidth=1, label='Bounding Box')
+    else:
+        ax.plot(*zip(*corners[edge]), color='red', linestyle='--', linewidth=1)
+
+
+# label
+bbox_center = np.mean(corners, axis=0)
+annotation_text = ("Compute mL2 (mL2 ± delta):\n" +
+                   "m1: 16.42 ± {:.2f}  => [{:.2f}, {:.2f}]\n".format(deltas[0], mL2[0]-deltas[0], mL2[0]+deltas[0]) +
+                   "m2: 96.97 ± {:.2f}  => [{:.2f}, {:.2f}]\n".format(deltas[1], mL2[1]-deltas[1], mL2[1]+deltas[1]) +
+                   "m3: 9.41 ± {:.2f}  => [{:.2f}, {:.2f}]".format(deltas[2], mL2[2]-deltas[2], mL2[2]+deltas[2]))
+ax.text(bbox_center[0], bbox_center[1], bbox_center[2], annotation_text, 
+        fontsize=10, color='black', bbox=dict(facecolor='white', alpha=0.6))
+
+# label and titels
+ax.set_xlabel('m1 (м)', fontsize=12)
+ax.set_ylabel('m2 (м/s)', fontsize=12)
+ax.set_zlabel('m3 (м/s²)', fontsize=12)
+ax.set_title('3D Confidence Ellipsoid with Bounding Box', fontsize=14)
+
+ax.view_init(elev=25, azim=45)
+ax.legend()
+ax.grid(True)
 plt.tight_layout()
 plt.show()
