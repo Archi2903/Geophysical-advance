@@ -76,11 +76,11 @@ eigenvecs = eigenvecs[:, ::-1]
 semi_axes = np.sqrt(chi2_crit / eigenvals)
 
 # Параметризация единичной сферы
-theta = np.linspace(0, 2*np.pi, 100)
+theta = np.linspace(0, 2*np.pi, 50)
 circle = np.array([np.cos(theta), np.sin(theta)])
 
 # Create 3 graphs
-fig, axs = plt.subplots(1, 3, figsize=(18, 5))
+fig, axs = plt.subplots(1, 3, figsize=(13, 5))
 
 # For every projections
 for i, (pair, ax) in enumerate(zip([(0,1), (0,2), (1,2)], axs)):
@@ -116,8 +116,8 @@ for i, (pair, ax) in enumerate(zip([(0,1), (0,2), (1,2)], axs)):
 from itertools import product
 
 # paramets for sphere
-u = np.linspace(0, 2*np.pi, 100)
-v = np.linspace(0, np.pi, 100)
+u = np.linspace(0, 2*np.pi, 50)
+v = np.linspace(0, np.pi, 50)
 x = np.outer(np.cos(u), np.sin(v))
 y = np.outer(np.sin(u), np.sin(v))
 z = np.outer(np.ones_like(u), np.cos(v))
@@ -143,7 +143,7 @@ print("m3: {:.2f} ± {:.2f}  => [{:.2f}, {:.2f}]".format(mL2[2], deltas[2],
       mL2[2]-deltas[2], mL2[2]+deltas[2]))
 
 # Plot 3d
-fig = plt.figure(figsize=(10, 8))
+fig = plt.figure(figsize=(7, 3))
 ax = fig.add_subplot(111, projection='3d')
 
 # ellipsoid
