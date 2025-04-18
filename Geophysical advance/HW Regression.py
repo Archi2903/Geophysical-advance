@@ -2,68 +2,81 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import chi2
 from mpl_toolkits.mplot3d import Axes3D
-"Data"
-# t = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-# y = np.array([109.4, 187.5, 267.5, 331.9, 386.1, 428.4, 452.2, 498.1, 512.3, 513.0]) 
-# y = m1 + m2*t - 0.5*m3*t**2 - equation 
-# mL1, mL2, mL3 = 16.42m, 96.97m/s, 9.41 using Least square 
-# mL2 = (((G(w)^T)*G(w))^-1)*(G(w)^T)*d(w)
-# mtrue = [10m, 100m/s, 9.8m/s^2]
-# sigma = σ = 8м - noise
-# m=10, n=3
-"""G = np.array([
-    [1, 1, 0.5],
-    [1, 2, 2.0],
-    [1, 3, 4.5],
-    [1, 4, 8.0],
-    [1, 5, 12.5],
-    [1, 6, 18.0],
-    [1, 7, 24.5],
-    [1, 8, 32.0],
-    [1, 9, 40.5],
-    [1, 10, 50.0]
-])"""
 
-
-# Covariace matrix - dependence between parameters
-#Cov = σ^2 * ((G^T)*G)^-1 equation Cov = 
+"Стандартные ошибки параметров"
+# Covariace matrix
+#Cov(θ) = σ^2 * ((G^T)*G)^-1 evequation
 Cov = np.array([
     [88.53, -33.60, -5.33],
     [-33.60, 15.44, 2.67],
     [-5.33, 2.67, 0.48]
 ])
-# Диспресия Var(m1) = 88.53 Var(m2) = 15.44m/s Var(m3) = 0.48m/s^2
-# Estimates parameter 95% confidence intervals   
-# Calculate the Standard Errors SE = Var(m)^-0.5
-# SE1=9.41, SE2=3.93 SE3=0.69 
+
+# mtrue = [10m, 100m/s, 9.8m/s^2]
+# σ=8м - noise
+# mL2 = (((G^T)*G)^-1)(G^T)*d
+# Оценённые параметры
+
+#95% ловерительные интервалы
+# m+-1.96*
 mL2 = np.array([16.42, 96.97, 9.41])
-# Confidence Intervals
-# m1=16.4m-+ 18.4m ->[-2.0, 34.8] 
+# m1=16.4m-+ 18.4m ->[-2.0, 34.8]
 # m2=97.0m/s-+ 7.7m/s ->[89.3, 104.7]
 # m3=9.4m/s^2-+ 1.4m/s^2 ->[8.0, 10.8]
 
 "Interpretation:mtrue values fall within the Confidence Intervals, Estimate is consistent despite the noise!"
 # Result mtrue and mL2 estimate a little bit diffrent because σ=8м - noise
 
-# χ²value 
-chi2_crit = chi2.ppf(0.95, 3)  # chi2.ppf(95%, v) χ² ≈ 7.815, v= m-n = 10-3 = 7
-"Interpretation: If χ² ≈ v, the model is consistent with the data!"
+# Критическое значение χ² для 3 степеней свободы и 95% доверия
+chi2_crit = chi2.ppf(0.95, 3)  # ≈7.815
+"""
+Проверка Критическое значение χ²
+# Исходные данные
+t = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+y_observed = np.array([109.4, 187.5, 267.5, 331.9, 386.1, 428.4, 452.2, 498.1, 512.3, 513.0])
+sigma = 8
 
-"95% CONFIDENCE ELLIPSOID"
-# Parametrs ellipsoid
+# Параметры модели
+m1, m2, m3 = 16.42, 96.97, 9.41
 
-Cinv = np.linalg.inv(Cov) # Inverse matrix covariace
-# corresponding eigenvalues and vectors Cinv
+# Прогнозы модели
+y_predicted = m1 + m2*t - 0.5*m3*t**2
+
+# 1. Вычисление статистики χ²
+chi_squared = np.sum(((y_observed - y_predicted)/sigma)**2)
+print(f"χ² статистика: {chi_squared:.2f}")
+
+# 2. Расчет p-значения (исправленная строка)
+degrees_of_freedom = len(t) - 3
+p_value = 1 - chi2.cdf(chi_squared, degrees_of_freedom)  # Используем chi2 из scipy.stats
+print(f"p-значение: {p_value:.2f}")
+
+# 3. Визуализация
+import matplotlib.pyplot as plt
+x = np.linspace(0, 20, 500)
+plt.plot(x, chi2.pdf(x, degrees_of_freedom), label=f'χ² (df={degrees_of_freedom})')
+plt.axvline(chi_squared, color='red', linestyle='--', label=f'χ² = {chi_squared:.2f}')
+plt.fill_between(x[x>=chi_squared], chi2.pdf(x[x>=chi_squared], degrees_of_freedom), 
+                 color='red', alpha=0.2, label=f'p = {p_value:.2f}')
+plt.legend()
+plt.show()
+"""
+
+
+# Вычисление обратной матрицы ковариации
+Cinv = np.linalg.inv(Cov)
+
+# Собственные значения и векторы Cinv
 eigenvals, eigenvecs = np.linalg.eigh(Cinv)
-# Sorting in descending order of eigenvalues
+# Сортировка в порядке убывания собственных значений
 eigenvals = eigenvals[::-1]
 eigenvecs = eigenvecs[:, ::-1]
-# Lengths of the semi-axes of the ellipsoid
+
+# Длины полуосей эллипсоида
 semi_axes = np.sqrt(chi2_crit / eigenvals)
 
-"Generate point ellipsoid"
-# parametrs 
-theta = np.linspace(0, 2*np.pi, 100)    
+# Параметризация единичной сферы
+theta = np.linspace(0, 2*np.pi, 100)
 circle = np.array([np.cos(theta), np.sin(theta)])
 
 # Create 3 graphs
@@ -74,7 +87,7 @@ for i, (pair, ax) in enumerate(zip([(0,1), (0,2), (1,2)], axs)):
     # Index parametrs for every projections
     idx1, idx2 = pair
     
-    # Extract the covariance submatrix for the selected parameters Выделяем подматрицу ковариации для выбранных параметров
+    # Выделяем подматрицу ковариации для выбранных параметров
     Cov_sub = Cov[[[idx1, idx1], [idx2, idx2]], [[idx1, idx2], [idx1, idx2]]]
     
     # Create ellips for projections
@@ -90,7 +103,7 @@ for i, (pair, ax) in enumerate(zip([(0,1), (0,2), (1,2)], axs)):
     ax.set_xlabel(labels[idx1])
     ax.set_ylabel(labels[idx2])
     
-    # Graps titles
+    # Названия графиков
     titles = [' (m1, m2)', ' (m1, m3)', ' (m2, m3)']
     ax.set_title(titles[i])
     
@@ -111,7 +124,8 @@ z = np.outer(np.ones_like(u), np.cos(v))
 sphere_points = np.vstack([x.flatten(), y.flatten(), z.flatten()])
 
 # Transform sphere to ellipsoid
-scaled_points = sphere_points * semi_axes[:, np.newaxis]
+scaled_points = sphere_points * semi_axes[:, np.newaxis] # scale
+# Rotate points using eigenvectors
 rotated_points = eigenvecs @ scaled_points
 ellipsoid_points = rotated_points + mL2[:, np.newaxis]
 
