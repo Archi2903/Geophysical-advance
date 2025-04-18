@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import chi2
 from mpl_toolkits.mplot3d import Axes3D
+from sk
 
 "Стандартные ошибки параметров"
 # Covariace matrix
@@ -193,3 +194,4 @@ ax.legend()
 ax.grid(True)
 plt.tight_layout()
 plt.show()
+""" """
