@@ -1,15 +1,14 @@
 """ 
 Rank Deficiency and Ill–Conditioning
-задача томографии с недостаточным рангом. 
-Нам нужно применить сингулярное разложение (SVD) для анализа и решения проблемы
+Using (SVD) Singular Value Decomposition
 """
 "____________________________________________________________________________________________________"
 
-"Шаг 1: Построение матрицы прямого оператора G"
+"Step 1: Define matrix G/data"
 """ 
 m = 9(s11,s12,s13,s21,s22,s23,s31,s32,s33) params model
 d = 8(t1,t2,t3,t4,t5,t6,t7,t8)             times data
-G = np.zeros((8, 9))
+G = np.zeros((8, 9))                       8x9 matrix G
 """
 import numpy as np
 
@@ -26,7 +25,8 @@ G = np.array([
 ])
 # print("Matrix G:")
 # print(G)
-""" [1 0 0 1 0 0 1 0 0]
+"""
+    [1 0 0 1 0 0 1 0 0]
     [0 1 0 0 1 0 0 1 0]
     [0 0 1 0 0 1 0 0 1]
     [1 1 1 0 0 0 0 0 0]
@@ -35,13 +35,14 @@ G = np.array([
     [1.41 0 0 0 1.41 0 0 0 1.41]
     [0 0 0 0 0 0 0 0 1.41]]
     [0 0 0 0 0 0 0 0 0]
-    """
+    
+"""
 "____________________________________________________________________________________________________"
 
-"Шаг 2: Сингулярное разложение (SVD) матрицы G"
-"eight singular values of G are, numerically evaluated"
+"Step 2: (SVD) matrix G"
+"Eight singular values of G are, numerically evaluated"
 U, S, Vt = np.linalg.svd(G, full_matrices=False) # full_matrices=False - не вычисляем полные матрицы U и Vt потому что G не квадратная
-# SVD возвращает три матрицы: 
+# SVD returns: matrix G = U @ S @ Vt
 # S - сингулярные значения (вектор)
 # U - матрица левых сингулярных векторов (m x m)
 # Vt - матрица правых сингулярных векторов (n x n)
@@ -64,11 +65,11 @@ s8: 0.000
 s9: 0.000
 """
 "____________________________________________________________________________________________________"
-"Шаг 3: Null Space (нулевое пространство)"
-# Столбцы V (transport Vt)
-V = Vt.T  # Vt - Transport matrix V трванспонируем, чтобы получить V потому что Vt - это транспонированная матрица V
+"step 3: Null Space Model V"
+#  V= (transport Vt) because (Vt^T) -> property algebraic matrix (Vt^T)^T
+V = Vt.T  # Vt - Transporn matrix V 
 
-V0 = V[:, -2:]  # извлекаем 8-й и 9-й столбцы (индексы 7 и 8)
+V0 = V[:, -2:]  # V8 and V9-collums (index -2 and -1) of V (V8, V9)
 
 print("\nModel Null Space V₀ (V₈, V₉):")
 print("   v8\t\t   v9")
@@ -85,8 +86,9 @@ V0_book = np.array([
     [ 0.3415, -0.4655],
     [ 0.0000,  0.0000]
 ])
-""" 
-from real data           book version 
+"""
+Model Null Space V₀ (V₈, V₉):
+from G matrix           book version 
    v8       v9           v8       v9
 -0.2177  0.1788        [-0.0620, -0.4035]
  0.5374  0.3670        [-0.4035,  0.0620]
@@ -101,7 +103,7 @@ from real data           book version
  """
 "____________________________________________________________________________________________________"
 # Step 5: Reshape vectors into 3x3 blocks
-v8_real = V0[:, 0].reshape(3, 3)
+v8_real = V0[:, 0].reshape(3, 3) 
 v9_real = V0[:, 1].reshape(3, 3)
 
 v8_book = V0_book[:, 0].reshape(3, 3)
