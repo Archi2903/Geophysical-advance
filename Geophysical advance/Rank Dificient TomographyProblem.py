@@ -40,7 +40,11 @@ G = np.array([
 
 "Шаг 2: Сингулярное разложение (SVD) матрицы G"
 "eight singular values of G are, numerically evaluated"
-U, S, Vt = np.linalg.svd(G, full_matrices=False)
+U, S, Vt = np.linalg.svd(G, full_matrices=False) # full_matrices=False - не вычисляем полные матрицы U и Vt потому что G не квадратная
+# SVD возвращает три матрицы: 
+# S - сингулярные значения (вектор)
+# U - матрица левых сингулярных векторов (m x m)
+# Vt - матрица правых сингулярных векторов (n x n)
 p = np.sum(S > 1e-10)  # Ранг p = 7 (s8 ≈ 0) m=n=p
 
 print("Singular values of G:")
@@ -62,7 +66,7 @@ s9: 0.000
 "____________________________________________________________________________________________________"
 "Шаг 3: Null Space (нулевое пространство)"
 # Столбцы V (transport Vt)
-V = Vt.T  # Vt - Transport matrix V
+V = Vt.T  # Vt - Transport matrix V трванспонируем, чтобы получить V потому что Vt - это транспонированная матрица V
 
 V0 = V[:, -2:]  # извлекаем 8-й и 9-й столбцы (индексы 7 и 8)
 
