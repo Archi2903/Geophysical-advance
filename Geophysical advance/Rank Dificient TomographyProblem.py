@@ -139,6 +139,25 @@ import matplotlib.pyplot as plt
 fig, axs = plt.subplots(1, 2, figsize=(8, 4), constrained_layout=True)
 
 # V8
+im1 = axs[0].imshow(v8_real, cmap='gray', vmin=-0.5, vmax=0.5)
+axs[0].set_title("V₈ (G)")
+axs[0].set_xlabel("j")
+axs[0].set_ylabel("i")
+axs[0].set_xticks([0, 1, 2])
+axs[0].set_xticklabels(['1', '2', '3'])
+axs[0].set_yticks([0, 1, 2])
+axs[0].set_yticklabels(['1', '2', '3'])
+
+# V9
+im2 = axs[1].imshow(v9_real, cmap='gray', vmin=-0.5, vmax=0.5)
+axs[1].set_title("V₉ (G)")
+axs[1].set_xlabel("j")
+axs[1].set_ylabel("i")
+axs[1].set_xticks([0, 1, 2])
+axs[1].set_xticklabels(['1', '2', '3'])
+axs[1].set_yticks([0, 1, 2])
+axs[1].set_yticklabels(['1', '2', '3'])
+# V8
 im1 = axs[0].imshow(v8_book, cmap='gray', vmin=-0.5, vmax=0.5)
 axs[0].set_title("V₈ (book)")
 axs[0].set_xlabel("j")
