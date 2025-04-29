@@ -55,47 +55,46 @@ plt.show()
 
 from scipy.ndimage import gaussian_filter1d
 
+import numpy as np
+import matplotlib.pyplot as plt
 
+# Параметры
+A = 25  # Амплитуда в pT
+tau = 0.1  # Временная постоянная в секундах
+t = np.logspace(-3, 0, 500)  # Логарифмически распределенные значения времени от 0.001 до 1 с
 
+# Без шума
+B = A * np.exp(-t / tau)
+dB_dt = -(A / tau) * np.exp(-t / tau)
 
-# Параметры сигнала
-T0 = 10.0  # Постоянная времени
-t = np.linspace(0, 100, 500)  # Временная ось с более мелким шагом для гладкости
+# С шумом
+np.random.seed(0)  # для воспроизводимости
+noise_B = np.random.normal(0, 3, size=t.shape)  # Шум 3 pT
+noise_dB_dt = np.random.normal(0, 0.3, size=t.shape)  # Шум 0.3 nT/s
 
-# Отклик на ступенчатую функцию (Example 3.2)
-v = 1 - np.exp(-t / T0)  # Скорость стремится к 1 м/с
-# Истинная модель: импульсы на 10 и 30 секундах
-m_true = np.exp(-0.5*((t-10)/1.5)**2) + 0.5*np.exp(-0.5*((t-30)/2.5)**2)
+B_noisy = B + noise_B
+dB_dt_noisy = dB_dt + noise_dB_dt
 
-# Сглаживание истинной модели
-d_true = gaussian_filter1d(m_true, sigma=15)
+# Создадим два отдельных графика: один для B(t), второй для dB/dt(t)
 
-# Добавление шума с дисперсией (0.05V)^2 (std = 0.05V)
-V = np.max(d_true)
-noise_std = (0.05 * V) # Стандартное отклонение
-noise = np.random.normal(0, noise_std, size=d_true.shape)
-d_noisy = d_true + noise
+fig, axs = plt.subplots(2, 1, figsize=(10, 10), sharex=True)
 
-# Построение графиков
-plt.figure(figsize=(10, 6))
+# График для B(t)
+axs[0].loglog(t, B, label='B(t) без шума (pT)', color='blue')
+axs[0].loglog(t, B_noisy, label='B(t) с шумом (pT)', linestyle='--', color='cyan')
+axs[0].set_ylabel('B (pT)')
+axs[0].set_title('Экспоненциальный спад B(t)')
+axs[0].grid(True, which='both', linestyle='--', linewidth=0.5)
+axs[0].legend()
 
-# Рис. 3.11: Истинная модель
-plt.subplot(2, 1, 1)
-plt.plot(t, m_true)
-plt.title("Figure 3.11: The true model")
-plt.xlabel("Time (s)")
-plt.ylabel("Acceleration (m/s²)")
-plt.xlim(0, 100)
-plt.ylim(0, 1.2)
-
-# Рис. 3.12: Зашумленные данные
-plt.subplot(2, 1, 2)
-plt.plot(t, d_noisy, color='darkred')
-plt.title("Figure 3.12: Noisy data ($N(0, (0.05V)^2)$)")  # Исправлена подпись
-plt.xlabel("Time (s)")
-plt.ylabel("V")
-plt.xlim(0, 100)
-plt.ylim(0, 1.2)
+# График для dB/dt(t)
+axs[1].loglog(t, dB_dt, label='dB/dt(t) без шума (nT/s)', color='red')
+axs[1].loglog(t, dB_dt_noisy, label='dB/dt(t) с шумом (nT/s)', linestyle='--', color='orange')
+axs[1].set_xlabel('Время (с)')
+axs[1].set_ylabel('dB/dt (nT/s)')
+axs[1].set_title('Экспоненциальный спад dB/dt(t)')
+axs[1].grid(True, which='both', linestyle='--', linewidth=0.5)
+axs[1].legend()
 
 plt.tight_layout()
 plt.show()
